@@ -2,7 +2,9 @@
 
         @section('content')
         <!-- dashboard section  -->
-        <div class="flex flex-col">
+        <div class="flex flex-col w-full h-full p-6 bg-white shadow-md rounded-xl">
+
+          <h2>Hi, {{ Auth::user()->name }}!</h2>
 
           @foreach ($reports as $report)
 

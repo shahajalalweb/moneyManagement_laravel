@@ -2,54 +2,76 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\CostModel;
+use App\Models\Cost;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\Auth;
 
 class CostController extends Controller
 {
     public function index()
     {
-        $costData = CostModel::orderBy('id', 'desc')->get();
-        return view('cost', compact('costData'));
-    }
-    public function create() {}
+        $costUserID = Auth::user()->id;
+        $costData = Cost::where('user_id', $costUserID)
+            ->orderBy('id', 'DESC')
+            ->paginate(3);
+        return view("cost", compact("costData"));
 
+    }
     public function store(Request $request)
     {
-        $data = new CostModel();  // Ensure 'Budget' is correctly named
-        $data->details = $request->details;
-        $data->cost = $request->cost;
-        $data->save();
-        return redirect()->route("cost");
-    }
+        $request->validate([
+            'details' => 'required',
+            'cost' => 'required|numeric|min:1',
+        ]);
 
-    public function show(string $id)
-    {
-        //
+
+        $user = Auth::user();
+        $data = [
+            'details' => $request->details,
+            'cost' => $request->cost,
+        ];
+        $user->costs()->create($data);
+        return redirect()->route("cost")->with('success', 'Cost created successfully');
+
+        // COST DEFFARENT WAY
+        // $costUserID = Auth::user()->id;
+        // $data = new Cost();
+        // $data->user_id = $costUserID;
+        // $data->details = $request->details;
+        // $data->cost = $request->cost;
+        // $data->save();
+        // return redirect()->route("cost")->with('success', 'Cost created successfully');
     }
 
     public function edit(string $id)
     {
-        $editCost = CostModel::findOrFail($id);
-        $costData = CostModel::orderBy('id', 'desc')->get();
+        $costUserID = Auth::user()->id;
+        $costData = Cost::where('user_id', $costUserID)
+            ->orderBy('id', 'DESC')
+            ->paginate(3);
+        $editCost = Cost::findOrFail($id);
         return view("cost", compact("costData", "editCost"));
     }
 
     public function update(Request $request, string $id)
     {
-        $data = CostModel::find($id);
+        $request->validate([
+            'details' => 'required',
+            'cost' => 'required|numeric|min:1',
+        ]);
+
+        $data = Cost::find($id);
         $data->details = $request->details;
         $data->cost = $request->cost;
 
         $data->save();
-        return redirect()->route("cost");
+        return redirect()->route("cost")->with('success', 'Cost updated successfully');
     }
 
     public function destroy(string $id)
     {
-        $budgetDel = CostModel::find($id);
-        $budgetDel->delete();
-        return redirect()->route("cost");
+        $costDel = Cost::find($id);
+        $costDel->delete();
+        return redirect()->route("cost")->with('success', 'Cost deleted successfully');
     }
 }

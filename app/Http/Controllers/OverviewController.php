@@ -2,37 +2,51 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\BudgetModel;
-use App\Models\CostModel;
+use App\Models\Cost;
+use App\Models\Budget; // Ensure this class exists in the specified namespace
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class OverviewController extends Controller
 {
 
     public function index()
     {
-        // THIS MONTH BUDGET COST SELECT 
-        $BudgetThisMonth = BudgetModel::whereMonth('created_at', date('m'))
-            ->whereYear('created_at', date('Y'))
-            ->sum('budget');
-        $totalCostThisMonth = CostModel::whereMonth('created_at', date('m'))
-            ->whereYear('created_at', date('Y'))
-            ->sum('cost');
-        $thisMonthAvailable = $BudgetThisMonth - $totalCostThisMonth;
+        
+// SELECT USER ID
+$userID = Auth::user()->id;
 
-        // LAST MONTH BUDGET COST SELECT
-        $BudgetLastMonth = BudgetModel::whereMonth('created_at', date('m', strtotime('-1 month')))
-            ->whereYear('created_at', date('Y', strtotime('-1 month')))
-            ->sum('budget');
-        $totalCostLastMonth = CostModel::whereMonth('created_at', date('m', strtotime('-1 month')))
-            ->whereYear('created_at', date('Y', strtotime('-1 month')))
-            ->sum('cost');
-        $lastMonthAvailable = $BudgetLastMonth - $totalCostLastMonth;
+// THIS MONTH BUDGET & COST
+$BudgetThisMonth = Budget::whereMonth('created_at', date('m'))
+    ->whereYear('created_at', date('Y'))
+    ->where('user_id', $userID)
+    ->sum('budget');
 
-        // TOTAL BUDGET SUM
-        $totalBudget = BudgetModel::sum('budget');
-        $totalCost = CostModel::sum('cost');
-        $totalAvailable = $totalBudget - $totalCost;
+$totalCostThisMonth = Cost::whereMonth('created_at', date('m'))
+    ->whereYear('created_at', date('Y'))
+    ->where('user_id', $userID)
+    ->sum('cost');
+
+$thisMonthAvailable = $BudgetThisMonth - $totalCostThisMonth;
+
+// LAST MONTH BUDGET & COST
+$BudgetLastMonth = Budget::whereMonth('created_at', date('m', strtotime('-1 month')))
+    ->whereYear('created_at', date('Y', strtotime('-1 month')))
+    ->where('user_id', $userID)
+    ->sum('budget');
+
+$totalCostLastMonth = Cost::whereMonth('created_at', date('m', strtotime('-1 month')))
+    ->whereYear('created_at', date('Y', strtotime('-1 month')))
+    ->where('user_id', $userID)
+    ->sum('cost');
+
+$lastMonthAvailable = $BudgetLastMonth - $totalCostLastMonth;
+
+// TOTAL BUDGET & COST
+$totalBudget = Budget::where('user_id', $userID)->sum('budget');
+$totalCost = Cost::where('user_id', $userID)->sum('cost');
+$totalAvailable = $totalBudget - $totalCost;
+
 
 
         // Group data for looping

@@ -11,10 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('cost_models', function (Blueprint $table) {
+        Schema::create('profiles', function (Blueprint $table) {
             $table->id();
-            $table->string('details')->nullable();
-            $table->string('cost')->nullable();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->text('bio')->nullable();
+            $table->string('profile_picture')->nullable();
+            $table->string('phone')->nullable();
+            $table->text('address')->nullable();
             $table->timestamps();
         });
     }
@@ -24,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('cost_models');
+        Schema::dropIfExists('profiles');
     }
 };
