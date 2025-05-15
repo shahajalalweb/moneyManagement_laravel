@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cost;
+use App\Models\CostCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -10,13 +11,24 @@ class CostController extends Controller
 {
     public function index()
     {
-        $costUserID = Auth::user()->id;
-        $costData = Cost::where('user_id', $costUserID)
+        $userId = Auth::id();
+
+        // Fetch categories
+        $costCategories  = CostCategory::where('user_id', $userId)->get();
+
+        // Redirect if no categories found
+        if ($costCategories->isEmpty()) {
+            return redirect()->route('category')->with('error', 'Please create a cost category first');
+        }
+
+        // Fetch cost data
+        $costData = Cost::where('user_id', $userId)
             ->orderBy('id', 'DESC')
             ->paginate(3);
-        return view("cost", compact("costData"));
 
+        return view("cost", compact("costData", "costCategories"));
     }
+
     public function store(Request $request)
     {
         $request->validate([
@@ -46,11 +58,19 @@ class CostController extends Controller
     public function edit(string $id)
     {
         $costUserID = Auth::user()->id;
-        $costData = Cost::where('user_id', $costUserID)
-            ->orderBy('id', 'DESC')
-            ->paginate(3);
-        $editCost = Cost::findOrFail($id);
-        return view("cost", compact("costData", "editCost"));
+        // Fetch categories
+        $costCategories  = CostCategory::where('user_id', $costUserID)->get();
+
+        if ($costCategories->isEmpty()) {
+            return redirect()->route('category')->with('error', 'Please create a cost category first');
+        } else {
+            $costData = Cost::where('user_id', $costUserID)
+                ->orderBy('id', 'DESC')
+                ->paginate(3);
+            $editCost = Cost::findOrFail($id);
+
+            return view("cost", compact("costData", "editCost", "costCategories"));
+        }
     }
 
     public function update(Request $request, string $id)

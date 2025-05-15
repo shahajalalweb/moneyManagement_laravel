@@ -8,6 +8,7 @@ use App\Http\Controllers\CostController;
 use App\Http\Controllers\OverviewController;
 use App\Http\Controllers\AuthenticationController;
 use App\Http\Controllers\BudgetController;
+use App\Http\Controllers\CostCategoryController;
 use App\Http\Controllers\PasswordController;
 use App\Http\Controllers\SettingsController;
 use Illuminate\Http\Request;
@@ -60,6 +61,17 @@ Route::middleware('auth')->group(function () {
     Route::put('/budget/update/{id}', [BudgetController::class, 'update'])->name('budgetUpdate');
 
     Route::get('/budget/delete/{id}', [BudgetController::class, 'destroy'])->name('budgetDel');
+
+    /*
+    |--------------------------------------------------------------------------
+    | COST controling 
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get('/category', [CostCategoryController::class, 'index'])->name('category');
+    Route::post('/cost-category/create', [CostCategoryController::class, 'store'])->name('cost-category.create');
+    Route::get('/cost-category/delete/{id}', [CostCategoryController::class, 'destroy'])->name('cost-category.delete');
+
 
     /*
     |--------------------------------------------------------------------------

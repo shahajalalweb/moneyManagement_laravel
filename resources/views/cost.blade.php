@@ -31,13 +31,21 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label for="details" class="block text-sm font-medium text-gray-700">Edit Details</label>
-                        <input id="details" required name="details" type="text"
-                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                            value="{{ $editCost->details }}">
+                        <select id="details" name="details" required
+                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                            <option disabled>Select details</option>
+                            @foreach ($costCategories  as $category)
+                                <option value="{{ $category->name }}"
+                                    {{ $editCost->details == $category->name ? 'selected' : '' }}>
+                                    {{ $category->name }}
+                                </option>
+                            @endforeach
+                        </select>
                     </div>
+
                     <div>
                         <label for="cost" class="block text-sm font-medium text-gray-700">Edit Cost</label>
-                        <input id="cost" required type="number" name="cost" min="1" 
+                        <input id="cost" required type="number" name="cost" min="1"
                             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                             value="{{ $editCost->cost }}">
                     </div>
@@ -53,12 +61,19 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label for="details" class="block text-sm font-medium text-gray-700">Details</label>
-                        <input id="details" name="details" required type="text" placeholder="Enter details"
+                        <select id="details" name="details" required
                             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                            <option value="" disabled selected>Select details</option>
+                            @foreach ($costCategories  as $category)
+                                <option value="{{ $category->name }}">{{ $category->name }}</option>
+                            @endforeach
+                        </select>
                     </div>
+
                     <div>
                         <label for="cost" class="block text-sm font-medium text-gray-700">Cost</label>
-                        <input id="cost" type="number" name="cost" required placeholder="Enter cost amount" min="1"
+                        <input id="cost" type="number" name="cost" required placeholder="Enter cost amount"
+                            min="1"
                             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                     </div>
                 </div>
